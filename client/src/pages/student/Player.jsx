@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import Rating from '../../components/student/Rating';
 import Footer from '../../components/student/Footer';
 import Loading from '../../components/student/Loading';
+import jsPDF from 'jspdf';
 
 const Player = ({ }) => {
 
@@ -105,9 +106,108 @@ const Player = ({ }) => {
     }
   }
 
+  const generateCertificate = () => {
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
+    })
+
+    // Background
+    doc.setFillColor(245, 245, 245)
+    doc.rect(0, 0, 297, 210, 'F')
+
+    // Outer border
+    doc.setDrawColor(30, 64, 175)
+    doc.setLineWidth(3)
+    doc.rect(10, 10, 277, 190)
+
+    // Inner border
+    doc.setDrawColor(30, 64, 175)
+    doc.setLineWidth(1)
+    doc.rect(14, 14, 269, 182)
+
+    // Header background
+    doc.setFillColor(30, 64, 175)
+    doc.rect(10, 10, 277, 40, 'F')
+
+    // Header title
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(28)
+    doc.setFont('helvetica', 'bold')
+    doc.text('CERTIFICATE OF COMPLETION', 148.5, 35, { align: 'center' })
+
+    // Subtitle
+    doc.setTextColor(30, 64, 175)
+    doc.setFontSize(14)
+    doc.setFont('helvetica', 'normal')
+    doc.text('This is to certify that', 148.5, 72, { align: 'center' })
+
+    // Student Name
+    doc.setTextColor(30, 64, 175)
+    doc.setFontSize(32)
+    doc.setFont('helvetica', 'bold')
+    doc.text(userData.name, 148.5, 92, { align: 'center' })
+
+    // Underline for name
+    doc.setDrawColor(30, 64, 175)
+    doc.setLineWidth(0.5)
+    doc.line(80, 96, 217, 96)
+
+    // Completion text
+    doc.setTextColor(80, 80, 80)
+    doc.setFontSize(14)
+    doc.setFont('helvetica', 'normal')
+    doc.text('has successfully completed the course', 148.5, 112, { align: 'center' })
+
+    // Course Name
+    doc.setTextColor(30, 64, 175)
+    doc.setFontSize(22)
+    doc.setFont('helvetica', 'bold')
+    doc.text(courseData.courseTitle, 148.5, 128, { align: 'center' })
+
+    // Underline for course
+    doc.line(80, 132, 217, 132)
+
+    // Date
+    const date = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+    doc.setTextColor(80, 80, 80)
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Date of Completion: ${date}`, 148.5, 150, { align: 'center' })
+
+    // Platform name
+    doc.setTextColor(30, 64, 175)
+    doc.setFontSize(18)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Edemy', 148.5, 168, { align: 'center' })
+
+    doc.setTextColor(80, 80, 80)
+    doc.setFontSize(10)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Online Learning Platform', 148.5, 175, { align: 'center' })
+
+    // Save PDF
+    doc.save(`${courseData.courseTitle}_Certificate.pdf`)
+  }
+
   useEffect(() => {
     getCourseProgress()
   }, [])
+
+  // Calculate total and completed lectures
+  const totalLectures = courseData
+    ? courseData.courseContent.reduce(
+        (total, chapter) => total + chapter.chapterContent.length, 0
+      )
+    : 0
+
+  const completedLectures = progressData?.lectureCompleted?.length || 0
+  const isCourseCompleted = totalLectures > 0 && completedLectures >= totalLectures
 
   return courseData ? (
     <>
@@ -148,7 +248,31 @@ const Player = ({ }) => {
             ))}
           </div>
 
-          <div className="flex items-center gap-2 py-3 mt-10">
+          {/* Certificate or Progress Section */}
+          {isCourseCompleted ? (
+            <div className="flex items-center gap-3 py-3 mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div>
+                <p className="font-semibold text-green-800">🎉 Course Completed!</p>
+                <p className="text-sm text-green-600">Congratulations! You have completed this course.</p>
+              </div>
+              <button
+                onClick={generateCertificate}
+                className="ml-auto bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium whitespace-nowrap"
+              >
+                Download Certificate 🎓
+              </button>
+            </div>
+          ) : (
+            <div className="py-2 mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-700">
+                Complete all {totalLectures} lectures to earn your certificate.
+                ({completedLectures}/{totalLectures} completed)
+              </p>
+            </div>
+          )}
+
+          {/* Rate Course */}
+          <div className="flex items-center gap-2 py-3 mt-4">
             <h1 className="text-xl font-bold">Rate this Course:</h1>
             <Rating initialRating={initialRating} onRate={handleRate} />
           </div>

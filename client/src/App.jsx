@@ -18,6 +18,7 @@ import Loading from './components/student/Loading'
 import About from './pages/student/About'
 import Contact from './pages/student/Contact'
 import Privacy from './pages/student/Privacy'
+import LearnMore from './pages/student/LearnMore'
 
 const App = () => {
 
@@ -38,6 +39,7 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/learn-more" element={<LearnMore />} />
         <Route path='/educator' element={<Educator />}>
           <Route path='/educator' element={<Dashboard />} />
           <Route path='add-course' element={<AddCourse />} />
