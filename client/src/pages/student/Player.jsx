@@ -228,7 +228,7 @@ const Player = ({ }) => {
                   <p className="text-sm md:text-default">{chapter.chapterContent.length} lectures - {calculateChapterTime(chapter)}</p>
                 </div>
 
-                <div className={`overflow-hidden transition-all duration-300 ${openSections[index] ? "max-h-96" : "max-h-0"}`}>
+                <div className={`overflow-hidden transition-all duration-300 ${openSections[index] ? "max-h-[2000px]" : "max-h-0"}`}>
                   <ul className="list-disc md:pl-10 pl-4 pr-4 py-2 text-gray-600 border-t border-gray-300">
                     {chapter.chapterContent.map((lecture, i) => (
                       <li key={i} className="flex items-start gap-2 py-1">
